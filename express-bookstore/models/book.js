@@ -109,15 +109,15 @@ class Book {
   static async update(isbn, data) {
     const result = await db.query(
       `UPDATE books SET 
-            amazon_url=($1),
-            author=($2),
-            language=($3),
-            pages=($4),
-            publisher=($5),
-            title=($6),
-            year=($7)
+            amazon_url=COALESCE(NULLIF($1, ''), amazon_url),
+            author=COALESCE(NULLIF($2, ''), author),
+            language=COALESCE(NULLIF($3, ''), language),
+            pages=COALESCE(NULLIF($4, 0), pages),
+            publisher=COALESCE(NULLIF($5, ''), publisher),
+            title=COALESCE(NULLIF($6, ''), title),
+            year=COALESCE(NULLIF($7, 0), year)
             WHERE isbn=$8
-        RETURNING isbn,
+            RETURNING isbn,
                   amazon_url,
                   author,
                   language,
@@ -161,3 +161,21 @@ class Book {
 }
 
 module.exports = Book;
+
+// `UPDATE books SET
+//             amazon_url=COALESCE(NULLIF($1, ''), amazon_url),
+//             author=COALESCE(NULLIF($2, ''), author),
+//             language=COALESCE(NULLIF($3, ''), language),
+//             pages=COALESCE(NULLIF($4, 0), pages),
+//             publisher=COALESCE(NULLIF($5, ''), publisher),
+//             title=COALESCE(NULLIF($6, ''), title),
+//             year=COALESCE(NULLIF($7, 0), year),
+//             WHERE isbn=$8,
+//         RETURNING isbn,
+//                   amazon_url,
+//                   author,
+//                   language,
+//                   pages,
+//                   publisher,
+//                   title,x
+//                   year`,
